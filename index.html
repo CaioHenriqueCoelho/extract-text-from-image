@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tesseract Convert Image em Texto</title>
+  <meta charset="utf-8">
+  <script src="https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js"></script>
+</head>
+<style type="text/css">
+  
+    div{
+        border:black solid 1px;
+        border-radius: 5px;
+        background-color: #ccc;
+        padding: 10px;
+        width: auto;
+        text-align: justify;
+        width: 70%;
+    }
+    body{
+        background-color: black;
+    }
+    h1,h2{
+        color:white;
+    }
+    #loader {
+      display: none;
+      width: 100px;
+    }
+    button{
+        background-color: green;
+        border: 2px solid white;
+        border-radius: 5px;
+        width: 150px;
+
+        height: 60px;
+        font-size: 30px;
+
+    }
+</style>
+<body>
+    <center>
+        <h1>Pegar texto de Imagem</h1>
+        <h2>Sรณ copiar a imagem e colar no site (control + v) </h2>
+        <div id="result"></div><br>
+        <div id="loader">Loading...</div>
+        <button onclick="copy()"> COPIAR </button>
+    </center>
+
+
+
+  <script>
+
+    function copy(){
+        const resultElement = document.getElementById('result');
+        const textToCopy = resultElement.innerText;
+        if (textToCopy) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+      }
+    }
+
+    document.addEventListener('paste', function (e) {
+      const loaderElement = document.getElementById('loader');
+      loaderElement.style.display = 'block';
+      const resultElement = document.getElementById('result');
+
+      if (e.clipboardData && e.clipboardData.items) {
+        const items = e.clipboardData.items;
+
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+
+            if (file) {
+              const reader = new FileReader();
+
+              reader.onload = function (event) {
+                const image = new Image();
+                image.src = event.target.result;
+
+                image.onload = function () {
+                  Tesseract.recognize(
+                    image,
+                    'eng',
+                    { logger: info => console.log(info) }
+                  ).then(result => {
+                    resultElement.innerText = result.text;
+                    loaderElement.style.display = 'none';
+                  }).catch(error => {
+                    console.error('Error during OCR:', error);
+                    resultElement.innerText = 'Error during OCR. Please try again.';
+                    loaderElement.style.display = 'none';
+                  });
+                };
+              };
+
+              reader.readAsDataURL(file);
+            } else {
+                loaderElement.style.display = 'none';
+                resultElement.innerText = 'Error reading pasted image.';
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
