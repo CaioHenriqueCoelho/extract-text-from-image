@@ -17,6 +17,8 @@
         width: auto;
         text-align: justify;
         width: 70%;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
     }
     body{
         background-color: black;
@@ -42,7 +44,7 @@
 <body>
     <center>
         <h1>Pegar texto de Imagem</h1>
-        <h2>Sรณ copiar a imagem e colar no site (control + v) </h2>
+        <h2>Só copiar a imagem e colar no site (control + v) </h2>
         <div id="result"></div><br>
         <div id="loader">Loading...</div>
         <button onclick="copy()"> COPIAR </button>
@@ -87,7 +89,7 @@
                 image.onload = function () {
                   Tesseract.recognize(
                     image,
-                    'eng',
+                    'por',
                     { logger: info => console.log(info) }
                   ).then(result => {
                     resultElement.innerText = result.text;
